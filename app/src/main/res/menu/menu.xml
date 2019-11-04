@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/infbook"
+        android:title="Thong Tin sach" />
+    <item
+        android:id="@+id/infauthor"
+        android:title="Thong Tin tac gia" />
+    <item
+        android:id="@+id/search"
+        android:title="Tim kiem sach/Tac gia" />
+</menu>
