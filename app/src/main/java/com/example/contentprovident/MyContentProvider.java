@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import java.util.HashMap;
 
@@ -40,8 +41,22 @@ public class MyContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        int count = 0;
+        switch (uriMatcher.match(uri)){
+            case ALLITEMS:
+                count = db.delete(TABLE_NAME, selection, selectionArgs);
+                break;
+
+            case ONEITEM:
+                String id = uri.getPathSegments().get(1);
+                count = db.delete(TABLE_NAME,   "id_book " + " = " + id +
+                                (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""),
+                        selectionArgs);
+                break;
+            default:
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     @Override
@@ -99,16 +114,22 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
-        sqLiteQueryBuilder.setTables(TABLE_NAME);
-        int result = (int)db.update(TABLE_NAME, values,selection, selectionArgs);
-//        if(result>0){
-//            Uri uri1 = ContentUris.withAppendedId(CONTENT_URI,result);
-//            getContext().getContentResolver().notifyChange(uri1,null);
-//            return uri1;
-//        }
-//        throw new SQLException("Failed to add a record into"+ uri);
-        return result;
+        int count = 0;
+        switch (uriMatcher.match(uri)) {
+            case ALLITEMS:
+                count = db.update(TABLE_NAME, values, selection, selectionArgs);
+                break;
+
+            case ONEITEM:
+                count = db.update(TABLE_NAME, values,
+                          "id_book = " + uri.getPathSegments().get(1) +
+                                (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""),
+                        selectionArgs);
+                break;
+            default:
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
 }
